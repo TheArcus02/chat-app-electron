@@ -1,5 +1,5 @@
-import { app, BrowserWindow } from 'electron';
 import path from 'path';
+import { app, BrowserWindow } from 'electron';
 import { isDev } from './util.js';
 import { getPreloadPath } from './path-resolver.js';
 

@@ -40,5 +40,25 @@ export default tseslint.config(
       'import/no-dynamic-require': 'warn',
       'import/no-nodejs-modules': 'warn',
     },
+    settings: {
+      'import/resolver': {
+        node: {
+          paths: ['src'],
+          extensions: ['.js', '.ts', '.jsx', '.tsx'],
+        },
+        typescript: {
+          'alwaysTryTypes': true,
+          project: './tsconfig.json',
+        },
+      },
+    },
+    overrides: [
+      {
+        files: ['electron/**/*.{js,ts,tsx}'],
+        rules: {
+          'import/no-nodejs-modules': 'off',
+        },
+      },
+    ],
   }
 );

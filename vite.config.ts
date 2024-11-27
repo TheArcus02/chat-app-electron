@@ -1,3 +1,5 @@
+// eslint-disable-next-line import/no-nodejs-modules
+import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 
@@ -11,5 +13,10 @@ export default defineConfig({
   server: {
     port: 5123,
     strictPort: true,
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
   },
 });
