@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
         <Route element={<GlobalWrapper />}>
           <Route path='/login' element={<Login />} />
           <Route element={<AuthWrapper />}>
-            <Route path='dashboard' element={<Dashboard />}>
+            <Route path='/' element={<Dashboard />}>
               <Route path='chat/:id' element={<Chat />} />
             </Route>
           </Route>

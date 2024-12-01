@@ -11,13 +11,13 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      navigate('/');
     }
   }, []);
 
   const handleLogin = () => {
     login();
-    navigate('/dashboard');
+    navigate('/');
   };
 
   return (
