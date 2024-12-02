@@ -16,7 +16,6 @@ const Chat = () => {
   // ? mockChatSessionData.messages.map(...)
   // ? lub
   // ? mockChatSessionData.participants.map(...)
-
   return <div>Chat: {id}</div>;
 };
 
