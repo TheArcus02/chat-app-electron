@@ -14,16 +14,19 @@ const Dashboard = () => {
         <ul className='overflow-y-scroll flex-1 list-none space-y-2 mt-4 max-h-[calc(100vh-220px)] overflow-x-hidden'>
           {mockUsers.map((user) => (
             <li
-              key={user.id}
+              key={user.userID}
               className='relative flex items-center space-x-3 rounded-lg hover:bg-base-300 p-2 cursor-pointer transition-colors'
             >
               <img
                 className='w-8 h-8 rounded-full bg-base-content'
-                src={`https://ui-avatars.com/api/?name=${user.name.replace(/ /g, '+')}`}
+                src={`https://ui-avatars.com/api/?name=${user.username.replace(/ /g, '+')}`}
                 alt='avatar'
               />
-              <span className='font-semibold'>{user.name}</span>
-              <Link className='absolute size-full' to={`/chat/${user.id}`} />
+              <span className='font-semibold'>{user.username}</span>
+              <Link
+                className='absolute size-full'
+                to={`/chat/${user.userID}`}
+              />
             </li>
           ))}
         </ul>

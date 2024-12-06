@@ -2,17 +2,34 @@ export {};
 
 declare global {
   interface User {
-    id: string;
-    name: string;
-    isOnline: boolean;
+    userID: string;
+    username: string;
   }
 
+  type MessageType = 'connect' | 'chat' | 'connect_response';
+
   interface Message {
-    id: string;
-    senderId: string;
-    receiverId: string;
+    type: MessageType;
+    senderID: string;
+    content?: string;
+    recipientID?: string;
+  }
+  interface ConnectResponse extends Message {
+    type: 'connect_response';
+    userID: string;
+    userList: User[];
+  }
+
+  interface ChatMessage extends Message {
+    type: 'chat';
+    recipientID: string;
     content: string;
-    timestamp: string;
+  }
+
+  interface ConnectToServerMessage extends Message {
+    type: 'connect';
+    senderID: string;
+    content: string;
   }
 
   interface ChatSession {
