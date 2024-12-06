@@ -32,6 +32,30 @@ declare global {
     content: string;
   }
 
+  type UnsubscribeFunction = () => void;
+
+  interface Window {
+    electron: {
+      connectUserToServer: (username: string) => void;
+      sendChatMessage: (message: ChatMessage) => void;
+      subscribeConnectionStatus: (
+        callback: (status: ConnectResponse) => void
+      ) => UnsubscribeFunction;
+      subscribeChatMessages: (
+        callback: (message: ChatMessage) => void
+      ) => UnsubscribeFunction;
+    };
+  }
+
+  type EventPayloadMapping = {
+    'connect-user-to-server': string;
+    'connection-status': ConnectResponse;
+    'chat-message': ChatMessage;
+    'send-message': ChatMessage;
+    'connect-response': ConnectResponse;
+  };
+
+  // Old
   interface ChatSession {
     id: string;
     participants: User[];

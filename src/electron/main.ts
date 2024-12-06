@@ -1,6 +1,6 @@
 import path from 'path';
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { isDev } from './util.js';
+import { ipcWebContentsSend, isDev } from './util.js';
 import { getPreloadPath } from './path-resolver.js';
 import * as net from 'net';
 
@@ -53,10 +53,18 @@ function handleServerResponse(data: Buffer, window: BrowserWindow) {
 
     switch (jsonData.type) {
       case 'connect_response':
-        window.webContents.send('connect-status', jsonData);
+        ipcWebContentsSend(
+          'connection-status',
+          window.webContents,
+          jsonData as ConnectResponse
+        );
         break;
       case 'chat':
-        window.webContents.send('chat-message', jsonData);
+        ipcWebContentsSend(
+          'chat-message',
+          window.webContents,
+          jsonData as ChatMessage
+        );
         break;
     }
   } catch (error) {

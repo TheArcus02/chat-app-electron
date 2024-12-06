@@ -8,8 +8,10 @@ const AuthContext = createContext({
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const connectionStatus = window.electron.subscribeConnectionStatus;
 
   const login = () => setIsAuthenticated(true);
+
   const logout = () => setIsAuthenticated(false);
 
   return (
