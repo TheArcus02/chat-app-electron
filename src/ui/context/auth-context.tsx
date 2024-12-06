@@ -1,21 +1,55 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
-const AuthContext = createContext({
+const AuthContext = createContext<{
+  isAuthenticated: boolean;
+  user: User | null;
+  login: (username: string) => void;
+  logout: () => void;
+}>({
   isAuthenticated: false,
+  user: null,
   login: () => {},
   logout: () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const connectionStatus = window.electron.subscribeConnectionStatus;
+  const [user, setUser] = useState<User | null>(null);
 
-  const login = () => setIsAuthenticated(true);
+  console.log(isAuthenticated, user);
 
-  const logout = () => setIsAuthenticated(false);
+  useEffect(() => {
+    const unsub = window.electron.subscribeConnectionStatus((status) => {
+      console.log(status);
+      setUser({
+        userID: status.content.userID,
+        username: status.content.username,
+      });
+      setIsAuthenticated(true);
+    });
+
+    return () => {
+      logout();
+      unsub();
+    };
+  });
+
+  const login = (username: string) => {
+    if (username) {
+      window.electron.connectUserToServer(username);
+    }
+  };
+
+  const logout = () => {
+    if (user) {
+      window.electron.dissconnectUserFromServer(user);
+      setIsAuthenticated(false);
+      setUser(null);
+    }
+  };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

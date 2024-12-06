@@ -11,13 +11,16 @@ declare global {
   interface Message {
     type: MessageType;
     senderID: string;
-    content?: string;
+    content?: string | Object;
     recipientID?: string;
   }
   interface ConnectResponse extends Message {
     type: 'connect_response';
-    userID: string;
-    userList: User[];
+    content: {
+      userID: string;
+      username: string;
+      userList: User[];
+    };
   }
 
   interface ChatMessage extends Message {
@@ -32,11 +35,18 @@ declare global {
     content: string;
   }
 
+  interface DissconnectFromServerMessage extends Message {
+    type: 'disconnect';
+    senderID: string;
+    content: string;
+  }
+
   type UnsubscribeFunction = () => void;
 
   interface Window {
     electron: {
       connectUserToServer: (username: string) => void;
+      dissconnectUserFromServer: (user: User) => void;
       sendChatMessage: (message: ChatMessage) => void;
       subscribeConnectionStatus: (
         callback: (status: ConnectResponse) => void
@@ -49,6 +59,7 @@ declare global {
 
   type EventPayloadMapping = {
     'connect-user-to-server': string;
+    'disconnect-user-from-server': User;
     'connection-status': ConnectResponse;
     'chat-message': ChatMessage;
     'send-message': ChatMessage;

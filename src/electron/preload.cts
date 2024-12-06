@@ -3,6 +3,8 @@ const electron = require('electron');
 electron.contextBridge.exposeInMainWorld('electron', {
   connectUserToServer: (username) =>
     ipcSend('connect-user-to-server', username),
+  dissconnectUserFromServer: (user: User) =>
+    ipcSend('disconnect-user-from-server', user),
   sendChatMessage: (message) => ipcSend('send-message', message),
   subscribeConnectionStatus: (callback: (status: ConnectResponse) => void) => {
     return ipcOn('connection-status', (status) => callback(status));

@@ -53,10 +53,17 @@ function handleServerResponse(data: Buffer, window: BrowserWindow) {
 
     switch (jsonData.type) {
       case 'connect_response':
+        const parsedContent = JSON.parse(jsonData.content as any);
+
+        const connectResponse = {
+          ...jsonData,
+          content: parsedContent,
+        } as ConnectResponse;
+
         ipcWebContentsSend(
           'connection-status',
           window.webContents,
-          jsonData as ConnectResponse
+          connectResponse
         );
         break;
       case 'chat':
