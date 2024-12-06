@@ -3,7 +3,7 @@ import { useAuth } from '../../context/auth-context';
 
 const AuthWrapper = ({ redirectTo = '/login' }) => {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <Outlet /> : <Navigate to={redirectTo} replace />;
+  return isAuthenticated ? <Outlet /> : <Navigate to={redirectTo} />;
 };
 
 export default AuthWrapper;

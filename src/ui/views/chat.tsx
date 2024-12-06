@@ -1,9 +1,7 @@
 import { useParams } from 'react-router';
-import { mockChatSessions } from '../mock/data';
 
 const Chat = () => {
   const { id } = useParams();
-  const mockChatSessionData = mockChatSessions[0];
 
   // ? Do zamkniecia chatu mozna uzyc przekierowania na dashboard czyli /
   // ? Przyklad:

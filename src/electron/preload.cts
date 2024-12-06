@@ -12,6 +12,9 @@ electron.contextBridge.exposeInMainWorld('electron', {
   subscribeChatMessages: (callback) => {
     return ipcOn('chat-message', (message) => callback(message));
   },
+  subscribeUserListUpdate: (callback) => {
+    return ipcOn('user-list-update', (users) => callback(users));
+  },
 } satisfies Window['electron']);
 
 function ipcOn<Key extends keyof EventPayloadMapping>(

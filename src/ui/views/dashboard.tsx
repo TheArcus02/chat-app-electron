@@ -2,17 +2,19 @@ import { LogOut, MessageCircle } from 'lucide-react';
 import { mockUsers } from '../mock/data';
 import { useAuth } from '../context/auth-context';
 import { Link, Outlet, useLocation } from 'react-router';
+import { useUserListContext } from '../context/user-list-context';
 
 const Dashboard = () => {
   const { logout } = useAuth();
   const location = useLocation();
+  const { users } = useUserListContext();
 
   return (
     <div className='flex-1 flex'>
       <div className='flex flex-col max-w-xs bg-base-200 w-full p-6'>
         <h2 className='text-xl font-semibold'>Active People</h2>
         <ul className='overflow-y-scroll flex-1 list-none space-y-2 mt-4 max-h-[calc(100vh-220px)] overflow-x-hidden'>
-          {mockUsers.map((user) => (
+          {users.map((user) => (
             <li
               key={user.userID}
               className='relative flex items-center space-x-3 rounded-lg hover:bg-base-300 p-2 cursor-pointer transition-colors'

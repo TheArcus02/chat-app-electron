@@ -73,6 +73,18 @@ function handleServerResponse(data: Buffer, window: BrowserWindow) {
           jsonData as ChatMessage
         );
         break;
+      case 'user_list_update':
+        const userListUpdate = {
+          ...jsonData,
+          content: JSON.parse(jsonData.content as any),
+        } as UserListUpdateMessage;
+
+        ipcWebContentsSend(
+          'user-list-update',
+          window.webContents,
+          userListUpdate
+        );
+        break;
     }
   } catch (error) {
     console.error('Error parsing JSON:', error);

@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useUserListContext } from './user-list-context';
 
-const AuthContext = createContext<{
+type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
   login: (username: string) => void;
   logout: () => void;
-}>({
+};
+
+const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   user: null,
   login: () => {},
@@ -15,7 +18,9 @@ const AuthContext = createContext<{
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const { updateUserList } = useUserListContext();
 
+  // ! Remove this line after implementing the login functionality
   console.log(isAuthenticated, user);
 
   useEffect(() => {
@@ -25,6 +30,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         userID: status.content.userID,
         username: status.content.username,
       });
+      updateUserList(status.content.userList);
       setIsAuthenticated(true);
     });
 
@@ -32,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       logout();
       unsub();
     };
-  });
+  }, []);
 
   const login = (username: string) => {
     if (username) {
@@ -55,4 +61,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useUserContext must be used within a UserProvider');
+  }
+  return context;
+};

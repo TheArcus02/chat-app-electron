@@ -6,7 +6,11 @@ declare global {
     username: string;
   }
 
-  type MessageType = 'connect' | 'chat' | 'connect_response';
+  type MessageType =
+    | 'connect'
+    | 'chat'
+    | 'connect_response'
+    | 'user_list_update';
 
   interface Message {
     type: MessageType;
@@ -41,6 +45,13 @@ declare global {
     content: string;
   }
 
+  interface UserListUpdateMessage extends Message {
+    type: 'user_list_update';
+    content: {
+      userList: User[];
+    };
+  }
+
   type UnsubscribeFunction = () => void;
 
   interface Window {
@@ -54,6 +65,9 @@ declare global {
       subscribeChatMessages: (
         callback: (message: ChatMessage) => void
       ) => UnsubscribeFunction;
+      subscribeUserListUpdate: (
+        callback: (message: UserListUpdateMessage) => void
+      ) => UnsubscribeFunction;
     };
   }
 
@@ -64,6 +78,7 @@ declare global {
     'chat-message': ChatMessage;
     'send-message': ChatMessage;
     'connect-response': ConnectResponse;
+    'user-list-update': UserListUpdateMessage;
   };
 
   // Old
