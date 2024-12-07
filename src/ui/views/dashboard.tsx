@@ -44,16 +44,21 @@ const Dashboard = () => {
               <span className='text-gray-500'>online</span>
             </div>
           </div>
-          <button className='btn btn-neutral w-full btn-sm' onClick={logout}>
+          <button
+            className='btn btn-neutral w-full btn-sm'
+            onClick={logout}
+          >
             <LogOut size={16} />
             Logout
           </button>
         </div>
       </div>
-      <div className='flex flex-col flex-1 items-center justify-center'>
+      <div className='p-6 flex flex-col flex-1 items-center justify-center'>
         {location.pathname === '/' ? (
           <>
-            <h1 className='text-3xl font-bold'>Welcome to the Chat</h1>
+            <h1 className='text-3xl font-bold'>
+              Welcome to the Chat
+            </h1>
             <p className='text-gray-500'>
               Select a user from the sidebar to start chatting
             </p>

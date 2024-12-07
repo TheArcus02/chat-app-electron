@@ -1,24 +1,33 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 type UserListContextType = {
   users: User[];
   updateUserList: (users: User[]) => void;
+  getUser: (userID: string) => User | undefined;
 };
 
 const UserListContext = createContext<UserListContextType>({
   users: [],
   updateUserList: () => {},
+  getUser: () => undefined,
 });
 
-export const UserListProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const UserListProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    const unsub = window.electron.subscribeUserListUpdate((message) => {
-      setUsers(message.content.userList);
-    });
+    const unsub = window.electron.subscribeUserListUpdate(
+      (message) => {
+        setUsers(message.content.userList);
+      },
+    );
     return unsub;
   }, []);
 
@@ -29,8 +38,15 @@ export const UserListProvider: React.FC<{ children: React.ReactNode }> = ({
     setUsers(users);
   };
 
+  const getUser = (userID: string) => {
+    const user = users.find((user) => user.userID === userID);
+    return user;
+  };
+
   return (
-    <UserListContext.Provider value={{ users, updateUserList }}>
+    <UserListContext.Provider
+      value={{ users, updateUserList, getUser }}
+    >
       {children}
     </UserListContext.Provider>
   );
@@ -39,7 +55,9 @@ export const UserListProvider: React.FC<{ children: React.ReactNode }> = ({
 export const useUserListContext = (): UserListContextType => {
   const context = useContext(UserListContext);
   if (!context) {
-    throw new Error('useUserContext must be used within a UserProvider');
+    throw new Error(
+      'useUserContext must be used within a UserProvider',
+    );
   }
   return context;
 };

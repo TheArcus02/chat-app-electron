@@ -1,6 +1,6 @@
 import path from 'path';
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { ipcWebContentsSend, isDev } from './util.js';
+import { ipcMainOn, ipcWebContentsSend, isDev } from './util.js';
 import { getPreloadPath } from './path-resolver.js';
 import * as net from 'net';
 
@@ -17,7 +17,9 @@ app.on('ready', () => {
   if (isDev()) {
     mainWindow.loadURL('http://localhost:5123');
   } else {
-    mainWindow.loadFile(path.join(app.getAppPath() + '/dist-react/index.html'));
+    mainWindow.loadFile(
+      path.join(app.getAppPath() + '/dist-react/index.html'),
+    );
   }
 
   console.log('Trying to connect to the server...');
@@ -63,14 +65,14 @@ function handleServerResponse(data: Buffer, window: BrowserWindow) {
         ipcWebContentsSend(
           'connection-status',
           window.webContents,
-          connectResponse
+          connectResponse,
         );
         break;
       case 'chat':
         ipcWebContentsSend(
           'chat-message',
           window.webContents,
-          jsonData as ChatMessage
+          jsonData as ChatMessage,
         );
         break;
       case 'user_list_update':
@@ -82,7 +84,7 @@ function handleServerResponse(data: Buffer, window: BrowserWindow) {
         ipcWebContentsSend(
           'user-list-update',
           window.webContents,
-          userListUpdate
+          userListUpdate,
         );
         break;
     }
@@ -91,11 +93,15 @@ function handleServerResponse(data: Buffer, window: BrowserWindow) {
   }
 }
 
-ipcMain.on('connect-user-to-server', (event, username: string) => {
+ipcMainOn('connect-user-to-server', (username: string) => {
   const message: ConnectToServerMessage = {
     type: 'connect',
     senderID: '',
     content: username,
   };
+  socket.write(JSON.stringify(message));
+});
+
+ipcMainOn('send-message', (message) => {
   socket.write(JSON.stringify(message));
 });
