@@ -1,21 +1,26 @@
 import { useParams } from 'react-router';
+import { useChatContext } from '../context/chat-context';
+import { useMemo } from 'react';
 
 const Chat = () => {
-  const { id } = useParams();
+  const { id: userId } = useParams();
+  const { chatMessages: allChatMessages } = useChatContext();
 
-  // ? Do zamkniecia chatu mozna uzyc przekierowania na dashboard czyli /
-  // ? Przyklad:
-  // ? navigate('/') z react-router
-  // ? lub
-  // ? <Link to='/' />
+  const chatMessages = useMemo(() => {
+    return allChatMessages.filter(
+      (message) => message.senderID === userId,
+    );
+  }, [allChatMessages, userId]);
 
-  // ? Fake dane mozna uzyc z mockChatSessionData
-  // ? Przyklad:
-  // ? mockChatSessionData.messages.map(...)
-  // ? lub
-  // ? mockChatSessionData.participants.map(...)
-
-  return <div>Chat: {id}</div>;
+  return (
+    <div>
+      {chatMessages.map((message) => (
+        <div key={message.content + message.senderID}>
+          <p>{message.content}</p>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 export default Chat;
