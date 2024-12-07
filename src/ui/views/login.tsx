@@ -13,11 +13,10 @@ const Login = () => {
     if (isAuthenticated) {
       navigate('/');
     }
-  }, []);
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = () => {
-    login();
-    navigate('/');
+    login(name);
   };
 
   return (
