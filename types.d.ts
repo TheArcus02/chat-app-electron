@@ -10,7 +10,8 @@ declare global {
     | 'connect'
     | 'chat'
     | 'connect_response'
-    | 'user_list_update';
+    | 'user_list_update'
+    | 'disconnect';
 
   interface Message {
     type: MessageType;
@@ -60,13 +61,13 @@ declare global {
       dissconnectUserFromServer: (user: User) => void;
       sendChatMessage: (message: ChatMessage) => void;
       subscribeConnectionStatus: (
-        callback: (status: ConnectResponse) => void
+        callback: (status: ConnectResponse) => void,
       ) => UnsubscribeFunction;
       subscribeChatMessages: (
-        callback: (message: ChatMessage) => void
+        callback: (message: ChatMessage) => void,
       ) => UnsubscribeFunction;
       subscribeUserListUpdate: (
-        callback: (message: UserListUpdateMessage) => void
+        callback: (message: UserListUpdateMessage) => void,
       ) => UnsubscribeFunction;
     };
   }

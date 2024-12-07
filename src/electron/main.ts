@@ -105,3 +105,12 @@ ipcMainOn('connect-user-to-server', (username: string) => {
 ipcMainOn('send-message', (message) => {
   socket.write(JSON.stringify(message));
 });
+
+ipcMainOn('disconnect-user-from-server', (user) => {
+  const message: DissconnectFromServerMessage = {
+    type: 'disconnect',
+    content: user.username,
+    senderID: user.userID,
+  };
+  socket.write(JSON.stringify(message));
+});

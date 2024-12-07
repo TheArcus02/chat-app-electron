@@ -1,4 +1,9 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useUserListContext } from './user-list-context';
 
 type AuthContextType = {
@@ -15,24 +20,30 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
 });
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const { updateUserList } = useUserListContext();
+  const { updateUserList, removeUser } = useUserListContext();
 
   // ! Remove this line after implementing the login functionality
   console.log(isAuthenticated, user);
 
   useEffect(() => {
-    const unsub = window.electron.subscribeConnectionStatus((status) => {
-      console.log(status);
-      setUser({
-        userID: status.content.userID,
-        username: status.content.username,
-      });
-      updateUserList(status.content.userList);
-      setIsAuthenticated(true);
-    });
+    const unsub = window.electron.subscribeConnectionStatus(
+      (status) => {
+        console.log(status);
+        setUser({
+          userID: status.content.userID,
+          username: status.content.username,
+        });
+        updateUserList(status.content.userList);
+        setIsAuthenticated(true);
+      },
+    );
 
     return () => {
       logout();
@@ -49,13 +60,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     if (user) {
       window.electron.dissconnectUserFromServer(user);
+      removeUser(user.userID);
       setIsAuthenticated(false);
       setUser(null);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, user, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -64,7 +78,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useUserContext must be used within a UserProvider');
+    throw new Error(
+      'useUserContext must be used within a UserProvider',
+    );
   }
   return context;
 };
