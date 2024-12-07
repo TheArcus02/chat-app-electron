@@ -1,7 +1,6 @@
 import { useParams } from 'react-router';
 import { useChatContext } from '../context/chat-context';
 import { useMemo, useState } from 'react';
-import { mockMessages } from '../mock/data';
 import { useUserListContext } from '../context/user-list-context';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/auth-context';

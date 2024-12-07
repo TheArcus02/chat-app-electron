@@ -1,5 +1,4 @@
 import { LogOut, MessageCircle } from 'lucide-react';
-import { mockUsers } from '../mock/data';
 import { useAuth } from '../context/auth-context';
 import { Link, Outlet, useLocation } from 'react-router';
 import { useUserListContext } from '../context/user-list-context';
