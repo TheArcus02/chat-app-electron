@@ -18,6 +18,7 @@ export const mockMessages: Message[] = [
     receiverId: '2',
     content: 'Hi Bob, how are you?',
     timestamp: '2024-11-24T09:15:00Z',
+    senderName: undefined
   },
   {
     id: '102',
@@ -25,6 +26,7 @@ export const mockMessages: Message[] = [
     receiverId: '1',
     content: 'Hey Alice! I’m good, how about you?',
     timestamp: '2024-11-24T09:16:00Z',
+    senderName: undefined
   },
   {
     id: '103',
@@ -32,6 +34,7 @@ export const mockMessages: Message[] = [
     receiverId: '4',
     content: 'Diana, are we still on for the meeting later?',
     timestamp: '2024-11-24T09:20:00Z',
+    senderName: undefined
   },
   {
     id: '104',
@@ -39,6 +42,7 @@ export const mockMessages: Message[] = [
     receiverId: '3',
     content: 'Yes, Charlie! I’ll call you around 2 PM.',
     timestamp: '2024-11-24T09:21:00Z',
+    senderName: undefined
   },
   {
     id: '105',
@@ -46,6 +50,7 @@ export const mockMessages: Message[] = [
     receiverId: '6',
     content: 'Frank, can you check the document I sent earlier?',
     timestamp: '2024-11-24T09:30:00Z',
+    senderName: undefined
   },
   {
     id: '106',
@@ -53,6 +58,7 @@ export const mockMessages: Message[] = [
     receiverId: '5',
     content: 'Sure, give me 10 minutes!',
     timestamp: '2024-11-24T09:32:00Z',
+    senderName: undefined
   },
   {
     id: '107',
@@ -60,6 +66,7 @@ export const mockMessages: Message[] = [
     receiverId: '1',
     content: 'Alice, are you joining the group call?',
     timestamp: '2024-11-24T09:45:00Z',
+    senderName: undefined
   },
   {
     id: '108',
@@ -67,6 +74,7 @@ export const mockMessages: Message[] = [
     receiverId: '7',
     content: 'Yes, just give me a moment to finish something.',
     timestamp: '2024-11-24T09:46:00Z',
+    senderName: undefined
   },
   {
     id: '109',
@@ -74,6 +82,7 @@ export const mockMessages: Message[] = [
     receiverId: '9',
     content: 'Ivy, did you see the new feature in the app?',
     timestamp: '2024-11-24T10:00:00Z',
+    senderName: undefined
   },
   {
     id: '110',
@@ -81,6 +90,7 @@ export const mockMessages: Message[] = [
     receiverId: '8',
     content: 'Yes, Hank! It looks great.',
     timestamp: '2024-11-24T10:02:00Z',
+    senderName: undefined
   },
   {
     id: '111',
@@ -88,6 +98,7 @@ export const mockMessages: Message[] = [
     receiverId: '3',
     content: 'Charlie, can you help me with the report?',
     timestamp: '2024-11-24T10:10:00Z',
+    senderName: undefined
   },
   {
     id: '112',
@@ -95,6 +106,7 @@ export const mockMessages: Message[] = [
     receiverId: '10',
     content: 'Of course, Jack! Send me the details.',
     timestamp: '2024-11-24T10:11:00Z',
+    senderName: undefined
   },
 ];
 

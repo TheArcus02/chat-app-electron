@@ -8,6 +8,7 @@ declare global {
   }
 
   interface Message {
+    senderName: ReactNode;
     id: string;
     senderId: string;
     receiverId: string;
