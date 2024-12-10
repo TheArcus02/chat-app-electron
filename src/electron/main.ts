@@ -5,6 +5,7 @@ import { getPreloadPath } from './path-resolver.js';
 import * as net from 'net';
 
 let socket: net.Socket;
+let connectedUser: User;
 
 app.on('ready', () => {
   const mainWindow = new BrowserWindow({
@@ -46,6 +47,15 @@ app.on('ready', () => {
 });
 
 app.on('before-quit', () => {
+  if (connectedUser) {
+    const disconnectMessage: DissconnectFromServerMessage = {
+      type: 'disconnect',
+      senderID: connectedUser.userID,
+      content: connectedUser.username,
+    };
+    socket.write(JSON.stringify(disconnectMessage));
+  }
+
   socket.end();
 });
 
@@ -61,6 +71,11 @@ function handleServerResponse(data: Buffer, window: BrowserWindow) {
           ...jsonData,
           content: parsedContent,
         } as ConnectResponse;
+
+        connectedUser = {
+          userID: parsedContent.userID,
+          username: parsedContent.username,
+        };
 
         ipcWebContentsSend(
           'connection-status',
@@ -103,5 +118,14 @@ ipcMainOn('connect-user-to-server', (username: string) => {
 });
 
 ipcMainOn('send-message', (message) => {
+  socket.write(JSON.stringify(message));
+});
+
+ipcMainOn('disconnect-user-from-server', (user) => {
+  const message: DissconnectFromServerMessage = {
+    type: 'disconnect',
+    content: user.username,
+    senderID: user.userID,
+  };
   socket.write(JSON.stringify(message));
 });

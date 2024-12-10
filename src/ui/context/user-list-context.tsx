@@ -9,12 +9,14 @@ type UserListContextType = {
   users: User[];
   updateUserList: (users: User[]) => void;
   getUser: (userID: string) => User | undefined;
+  removeUser: (userID: string) => void;
 };
 
 const UserListContext = createContext<UserListContextType>({
   users: [],
   updateUserList: () => {},
   getUser: () => undefined,
+  removeUser: () => undefined,
 });
 
 export const UserListProvider: React.FC<{
@@ -43,9 +45,15 @@ export const UserListProvider: React.FC<{
     return user;
   };
 
+  const removeUser = (userID: string) => {
+    setUsers((prevUsers) =>
+      prevUsers.filter((user) => user.userID !== userID),
+    );
+  };
+
   return (
     <UserListContext.Provider
-      value={{ users, updateUserList, getUser }}
+      value={{ users, updateUserList, getUser, removeUser }}
     >
       {children}
     </UserListContext.Provider>
