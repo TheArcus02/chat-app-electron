@@ -1,8 +1,9 @@
-import { LogOut, Search, MessageSquare, User } from "lucide-react";
-import { mockUsers } from "../mock/data";
-import { useAuth } from "../context/auth-context";
-import { Link, Outlet, useLocation, useNavigate } from "react-router";
-import { useState } from "react";
+import { LogOut, MessageCircle, MessageSquare, Search, User } from 'lucide-react';
+import { useAuth } from '../context/auth-context';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router';
+import { useUserListContext } from '../context/user-list-context';
+import { useState } from 'react';
+import { mockUsers } from '../mock/data';
 
 const Dashboard = () => {
   const { logout } = useAuth();
@@ -10,14 +11,11 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredUsers = mockUsers.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
+  const { users } = useUserListContext();
 
   return (
     <div className="flex h-screen bg-base-200 text-base-content">
@@ -50,25 +48,25 @@ const Dashboard = () => {
 
         <h3 className="text-lg font-semibold mb-2 text-primary">Active Users</h3>
         <ul className="overflow-y-auto flex-1 space-y-2">
-          {filteredUsers.map((user) => (
+          {users.map((user) => (
             <li
-              key={user.id}
+              key={user.userID}
               className={`relative flex items-center space-x-3 rounded-lg p-3 cursor-pointer transition-all ${
-                location.pathname === `/chat/${user.id}`
+                location.pathname === `/chat/${user.userID}`
                   ? "bg-primary text-white"
                   : "bg-base-100 hover:bg-base-200"
               }`}
             >
               <img
                 className="w-10 h-10 rounded-full"
-                src={`https://ui-avatars.com/api/?name=${user.name.replace(/ /g, "+")}`}
-                alt={user.name}
+                src={`https://ui-avatars.com/api/?name=${user.username.replace(/ /g, "+")}`}
+                alt={user.username}
               />
-              <span className="font-medium">{user.name}</span>
+              <span className="font-medium">{user.username}</span>
               <Link
                 className="absolute inset-0"
-                to={`/chat/${user.id}`}
-                aria-label={`Open chat with ${user.name}`}
+                to={`/chat/${user.userID}`}
+                aria-label={`Open chat with ${user.username}`}
               />
             </li>
           ))}
@@ -81,8 +79,8 @@ const Dashboard = () => {
             {location.pathname.startsWith("/chat/") 
               ? `Chat with ${
                   mockUsers.find(
-                    (user) => `/chat/${user.id}` === location.pathname
-                  )?.name || "Unknown"
+                    (user) => `/chat/${user.userID}` === location.pathname
+                  )?.username || "Unknown"
                 }`
               : "General Chat"}
           </h1>

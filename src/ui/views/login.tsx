@@ -76,7 +76,7 @@ const Login = () => {
 
     setIsSubmitting(true);
     setTimeout(() => {
-      login();
+      login(name);
       navigate("/");
     }, 500);
   };

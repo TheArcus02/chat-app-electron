@@ -1,49 +1,93 @@
-import { Link, useParams } from 'react-router';
-import { mockChatSessions, mockUsers } from '../mock/data'; 
-const Chat = () => {
-  const { id } = useParams();  
-  const chatSession = mockChatSessions[0]
+import { useParams } from 'react-router';
+import { useChatContext } from '../context/chat-context';
+import { useMemo, useState } from 'react';
+import { useUserListContext } from '../context/user-list-context';
+import { cn } from '../lib/utils';
+import { useAuth } from '../context/auth-context';
 
-  if (!chatSession) {
-    return <div>Sesja czatu nie została znaleziona.</div>;  
+const Chat = () => {
+  const { id: participantUserId } = useParams();
+  const { chatMessages: allChatMessages, sendChatMessage } =
+    useChatContext();
+  const { getUser } = useUserListContext();
+  const { user: currentUser } = useAuth();
+
+  const [inputMessage, setInputMessage] = useState('');
+
+  const chatUser = useMemo(
+    () => getUser(participantUserId || ''),
+    [getUser, participantUserId],
+  );
+
+  const chatMessages = useMemo(() => {
+    return allChatMessages.filter(
+      (message) =>
+        (message.senderID === participantUserId &&
+          message.recipientID === currentUser?.userID) ||
+        (message.recipientID === participantUserId &&
+          message.senderID === currentUser?.userID),
+    );
+  }, [allChatMessages, participantUserId]);
+
+  function handleSendMessage() {
+    if (!inputMessage || !participantUserId) return;
+    setInputMessage('');
+    sendChatMessage(participantUserId, inputMessage);
   }
 
-  const { participants, messages } = chatSession;  
-
-  return (
-    <div>
-      <h1>Chat: {id}</h1>
-      <div>
-        <h2>Participants:</h2>
-        <ul>
-          {participants.map(participant => {
-            const userStatus = participant.isOnline ? 'Online' : 'Offline';
-            return (
-              <li key={participant.id}>
-                {participant.name} - {userStatus}
-              </li>
-            );
-          })}
-        </ul>
+  return chatUser && currentUser ? (
+    <>
+      <div className='w-full'>
+        <h1 className='text-2xl font-semibold'>
+          Chat with {chatUser.username}
+        </h1>
       </div>
-
-      <div>
-        <h2>Messages:</h2>
-        <div>
-          {messages.map(message => {
-            const sender = mockUsers.find(user => user.id === message.senderId);
-            return (
-              <div key={message.id}>
-                <p><strong>{sender?.name}:</strong> {message.content}</p>
-                <p><small>{new Date(message.timestamp).toLocaleString()}</small></p>
+      <div className='w-full flex-1 overflow-y-scroll max-h-[calc(100vh-100px)]'>
+        {chatMessages.map((message) => {
+          const isSenderParticipant =
+            message.senderID === participantUserId;
+          const user = isSenderParticipant ? chatUser : currentUser;
+          return (
+            <div
+              className={cn(
+                'chat',
+                isSenderParticipant ? 'chat-start' : 'chat-end',
+              )}
+              key={message.content + message.senderID}
+            >
+              <div className='chat-image avatar'>
+                <div className='w-10 rounded-full'>
+                  <img
+                    alt='Tailwind CSS chat bubble component'
+                    src={`https://ui-avatars.com/api/?name=${user.username.replace(/ /g, '+')}`}
+                  />
+                </div>
               </div>
-            );
-          })}
-        </div>
-      </div>
+              <div className='chat-header'>{user.username}</div>
 
-      <Link to="/">Back to Dashboard</Link> {/* Link do dashboard */}
-    </div>
+              <div className='chat-bubble'>{message.content}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div className='w-full flex space-x-2'>
+        <input
+          type='text'
+          className='input input-bordered w-full'
+          placeholder='Type your message here'
+          value={inputMessage}
+          onChange={(e) => setInputMessage(e.target.value)}
+        />
+        <button
+          className='btn btn-secondary'
+          onClick={handleSendMessage}
+        >
+          Send
+        </button>
+      </div>
+    </>
+  ) : (
+    <div>User not found</div>
   );
 };
 
