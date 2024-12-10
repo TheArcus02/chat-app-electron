@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useUserListContext } from '../context/user-list-context';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/auth-context';
+import { Send } from 'lucide-react';
 
 const Chat = () => {
   const { id: participantUserId } = useParams();
@@ -74,15 +75,15 @@ const Chat = () => {
         <input
           type='text'
           className='input input-bordered w-full'
-          placeholder='Type your message here'
+          placeholder='Type your message here...'
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
         />
         <button
-          className='btn btn-secondary'
+          className='btn btn-primary btn-circle'
           onClick={handleSendMessage}
         >
-          Send
+          <Send className='w-5 h-5 text-primary-content' />
         </button>
       </div>
     </>
