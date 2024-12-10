@@ -36,12 +36,18 @@ export const AuthProvider = ({
     const unsub = window.electron.subscribeConnectionStatus(
       (status) => {
         console.log(status);
-        setUser({
-          userID: status.content.userID,
-          username: status.content.username,
-        });
-        updateUserList(status.content.userList);
-        setIsAuthenticated(true);
+        if (status.type === 'connect_response') {
+          setUser({
+            userID: status.content.userID,
+            username: status.content.username,
+          });
+          updateUserList(status.content.userList);
+          setIsAuthenticated(true);
+        } else if (status.type === 'disconnect_response') {
+          removeUser(status.content.userID);
+          setIsAuthenticated(false);
+          setUser(null);
+        }
       },
     );
 
@@ -59,7 +65,7 @@ export const AuthProvider = ({
 
   const logout = () => {
     if (user) {
-      window.electron.dissconnectUserFromServer(user);
+      window.electron.disconnectUserFromServer(user);
       removeUser(user.userID);
       setIsAuthenticated(false);
       setUser(null);

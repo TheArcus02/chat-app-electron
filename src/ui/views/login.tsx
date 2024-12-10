@@ -109,18 +109,13 @@ const Login = () => {
           error={error && !name.trim() ? error : ''}
         />
 
-        <div className='form-control w-full mb-6'>
-          <label className='block text-sm font-medium text-gray-300 mb-2'>
-            Podaj serwer
-          </label>
-          <InputField
-            label='Serwer'
-            value={server}
-            placeholder='Wybierz serwer'
-            onChange={(e: any) => setServer(e.target.value)}
-            error={error && !server.trim() ? error : ''}
-          />
-        </div>
+        <InputField
+          label='Serwer'
+          value={server}
+          placeholder='Wybierz serwer'
+          onChange={(e: any) => setServer(e.target.value)}
+          error={error && !server.trim() ? error : ''}
+        />
 
         {error && (
           <p className='text-red-500 text-sm mb-4'>{error}</p>

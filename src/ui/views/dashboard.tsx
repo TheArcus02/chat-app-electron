@@ -88,9 +88,9 @@ const Dashboard = () => {
 
       <div className='flex flex-col items-center justify-center w-full p-6 bg-base-200'>
         {location.pathname === '/' ? (
-          <div className='flex items-center justify-center h-full'>
-            <MessageSquareText size={64} />
-            <p className='text-gray-500 text-center'>
+          <div className='flex flex-col space-y-6 items-center justify-center h-full'>
+            <MessageSquareText size={64} strokeWidth={1} />
+            <p className='text-base-content text-center'>
               Select a user from the sidebar to start chatting.
             </p>
           </div>
