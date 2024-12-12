@@ -5,18 +5,37 @@ import { LogIn, Info } from 'lucide-react';
 import { toast } from 'react-toastify';
 import InputField from '@/ui/components/input-field';
 import Modal from '@/ui/components/modal';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { cn } from '../lib/utils';
+
+const loginSchema = z.object({
+  name: z
+    .string()
+    .nonempty({ message: 'Podaj login' })
+    .min(3, { message: 'Login musi mieć co najmniej 3 znaki.' }),
+  server: z
+    .string()
+    .nonempty({ message: 'Podaj adres serwera' })
+    .ip({ message: 'Niepoprawny adres serwera.', version: 'v4' }),
+});
+
+type LoginSchemaType = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  // Form state
-  const [name, setName] = useState('');
-  const [server, setServer] = useState('');
-  const [error, setError] = useState('');
-
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginSchemaType>({
+    resolver: zodResolver(loginSchema),
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -24,27 +43,18 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleLogin = async () => {
-    setError('');
-    if (!name.trim() || name.length < 3) {
-      setError('Login musi mieć co najmniej 3 znaki.');
-      return;
-    }
-    if (!server.trim()) {
-      setError('Musisz wybrać serwer.');
-      return;
-    }
-
-    setIsSubmitting(true);
+  const onSubmit = async (data: LoginSchemaType) => {
+    const { name, server } = data;
 
     setTimeout(async () => {
-      const result = await login(server, name);
-      if (!result) {
+      const loginResult = await login(server, name);
+      if (!loginResult) {
         toast.error(
           'Nie udało się połączyć z serwerem. Spróbuj ponownie.',
         );
-        setIsSubmitting(false);
+        return;
       }
+
       toast.success('Zalogowano pomyślnie!');
       navigate('/');
     }, 500);
@@ -67,46 +77,43 @@ const Login = () => {
             rozmowę.
           </p>
         </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <InputField
+            label='Twój login'
+            type='text'
+            placeholder='Wpisz swój login'
+            {...register('name')}
+            error={errors.name?.message}
+          />
 
-        <InputField
-          label='Twój login'
-          type='text'
-          value={name}
-          placeholder='Wpisz swój login'
-          onChange={(e: any) => setName(e.target.value)}
-          error={error && !name.trim() ? error : ''}
-        />
+          <InputField
+            label='Serwer'
+            type='text'
+            placeholder='Wybierz serwer'
+            {...register('server')}
+            error={errors.server?.message}
+          />
 
-        <InputField
-          label='Serwer'
-          value={server}
-          placeholder='Wybierz serwer'
-          onChange={(e: any) => setServer(e.target.value)}
-          error={error && !server.trim() ? error : ''}
-        />
-
-        {error && (
-          <p className='text-red-500 text-sm mb-4'>{error}</p>
-        )}
-
-        <button
-          className={`btn w-full ${
-            isSubmitting
-              ? 'opacity-50'
-              : 'bg-indigo-600 hover:bg-indigo-700'
-          } rounded-full py-3`}
-          onClick={handleLogin}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? (
-            <div className='spinner-border animate-spin h-5 w-5 border-4 border-indigo-300 rounded-full' />
-          ) : (
-            <>
-              <LogIn size={20} className='mr-2' />
-              Zaloguj
-            </>
-          )}
-        </button>
+          <button
+            className={cn(
+              'btn w-full rounded-full py-3',
+              isSubmitting || Object.keys(errors).length > 0
+                ? 'opacity-50'
+                : 'bg-indigo-600 hover:bg-indigo-700',
+            )}
+            disabled={isSubmitting || Object.keys(errors).length > 0}
+            type='submit'
+          >
+            {isSubmitting ? (
+              <div className='spinner-border animate-spin h-5 w-5 border-4 border-indigo-300 rounded-full' />
+            ) : (
+              <>
+                <LogIn size={20} className='mr-2' />
+                Zaloguj
+              </>
+            )}
+          </button>
+        </form>
 
         <div className='text-center mt-4'>
           <button
