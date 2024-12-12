@@ -9,14 +9,17 @@ import { useUserListContext } from './user-list-context';
 type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
-  login: (username: string) => void;
+  login: (
+    host: string,
+    username: string,
+  ) => Promise<boolean | undefined>;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   user: null,
-  login: () => {},
+  login: () => Promise.resolve(false),
   logout: () => {},
 });
 
@@ -57,9 +60,16 @@ export const AuthProvider = ({
     };
   }, []);
 
-  const login = (username: string) => {
-    if (username) {
-      window.electron.connectUserToServer(username);
+  const login = async (host: string, username: string) => {
+    try {
+      if (!host || !username) return false;
+      return (await window.electron.connectUserToServer({
+        host,
+        username,
+      })) as boolean;
+    } catch (error) {
+      console.error('Error connecting to server:', error);
+      return false;
     }
   };
 

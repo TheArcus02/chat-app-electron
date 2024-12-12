@@ -9,6 +9,7 @@ import { useAuth } from '../context/auth-context';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router';
 import { useUserListContext } from '../context/user-list-context';
 import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 const Dashboard = () => {
   const { logout, user: currentUser } = useAuth();
@@ -18,6 +19,7 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     logout();
+    toast.info('Wylogowano pomyślnie!');
     navigate('/login');
   };
   const { users } = useUserListContext();
@@ -47,7 +49,7 @@ const Dashboard = () => {
           />
           <input
             type='text'
-            placeholder='Search users...'
+            placeholder='Wyszukaj...'
             className='input input-bordered w-full pl-10'
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -55,7 +57,7 @@ const Dashboard = () => {
         </div>
 
         <h3 className='text-lg font-semibold mb-2 text-primary'>
-          Active Users
+          Aktywni użytkownicy
         </h3>
         <ul className='overflow-y-auto flex-1 space-y-2'>
           {users.map(
@@ -91,7 +93,8 @@ const Dashboard = () => {
           <div className='flex flex-col space-y-6 items-center justify-center h-full'>
             <MessageSquareText size={64} strokeWidth={1} />
             <p className='text-base-content text-center'>
-              Select a user from the sidebar to start chatting.
+              Wybierz użytkownika z listy po lewej stronie, aby
+              rozpocząć rozmowę.
             </p>
           </div>
         ) : (

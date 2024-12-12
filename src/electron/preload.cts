@@ -1,8 +1,8 @@
 const electron = require('electron');
 
 electron.contextBridge.exposeInMainWorld('electron', {
-  connectUserToServer: (username) =>
-    ipcSend('connect-user-to-server', username),
+  connectUserToServer: async (data) =>
+    await ipcInvoke('connect-user-to-server', data),
   disconnectUserFromServer: (user) =>
     ipcSend('disconnect-user-from-server', user),
   sendChatMessage: (message) => ipcSend('send-message', message),
@@ -32,4 +32,11 @@ function ipcSend<Key extends keyof EventPayloadMapping>(
   payload: EventPayloadMapping[Key],
 ) {
   electron.ipcRenderer.send(key, payload);
+}
+
+function ipcInvoke<Key extends keyof EventPayloadMapping>(
+  key: Key,
+  payload?: EventPayloadMapping[Key],
+): Promise<unknown> {
+  return electron.ipcRenderer.invoke(key, payload);
 }

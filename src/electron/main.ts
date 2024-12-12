@@ -1,53 +1,37 @@
 import path from 'path';
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { ipcMainOn, ipcWebContentsSend, isDev } from './util.js';
+import {
+  ipcMainHandle,
+  ipcMainOn,
+  ipcWebContentsSend,
+  isDev,
+} from './util.js';
 import { getPreloadPath } from './path-resolver.js';
 import * as net from 'net';
 
 let socket: net.Socket;
 let connectedUser: User;
+let window: BrowserWindow;
 
 app.on('ready', () => {
-  const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+  window = new BrowserWindow({
+    width: 1200,
+    height: 800,
     webPreferences: {
       preload: getPreloadPath(),
     },
   });
   if (isDev()) {
-    mainWindow.loadURL('http://localhost:5123');
+    window.loadURL('http://localhost:5123');
   } else {
-    mainWindow.loadFile(
+    window.loadFile(
       path.join(app.getAppPath() + '/dist-react/index.html'),
     );
   }
-
-  console.log('Trying to connect to the server...');
-  const SERVER_HOST = 'localhost';
-  const SERVER_PORT = 8080;
-  socket = new net.Socket();
-
-  socket.connect(SERVER_PORT, SERVER_HOST, () => {
-    console.log('Connected to the server!');
-  });
-
-  socket.on('data', (data) => {
-    console.log('Received data:', data.toString());
-    handleServerResponse(data, mainWindow);
-  });
-
-  socket.on('error', (error) => {
-    console.error('Connection error:', error);
-  });
-
-  socket.on('close', () => {
-    console.log('Connection closed');
-  });
 });
 
 app.on('before-quit', () => {
-  if (connectedUser) {
+  if (connectedUser && socket) {
     const disconnectMessage: DissconnectFromServerMessage = {
       type: 'disconnect',
       senderID: connectedUser.userID,
@@ -59,7 +43,29 @@ app.on('before-quit', () => {
   socket.end();
 });
 
-function handleServerResponse(data: Buffer, window: BrowserWindow) {
+function connectToServer(host: string, port: number) {
+  console.log('Trying to connect to the server...');
+  socket = new net.Socket();
+
+  socket.connect(port, host, () => {
+    console.log('Connected to the server!');
+  });
+
+  socket.on('data', (data) => {
+    console.log('Received data:', data.toString());
+    handleServerResponse(data);
+  });
+
+  socket.on('error', (error) => {
+    console.error('Connection error:', error);
+  });
+
+  socket.on('close', () => {
+    console.log('Connection closed');
+  });
+}
+
+function handleServerResponse(data: Buffer) {
   try {
     const jsonData = JSON.parse(data.toString()) as Message;
 
@@ -108,13 +114,47 @@ function handleServerResponse(data: Buffer, window: BrowserWindow) {
   }
 }
 
-ipcMainOn('connect-user-to-server', (username: string) => {
-  const message: ConnectToServerMessage = {
-    type: 'connect',
-    senderID: '',
-    content: username,
-  };
-  socket.write(JSON.stringify(message));
+ipcMainHandle('connect-user-to-server', (data) => {
+  console.log('[connect-user-to-server]: ', data);
+  const { host, username } = data;
+  const port = 8080;
+  if (socket && !socket.destroyed) {
+    console.log('Socket already connected');
+    return;
+  }
+
+  console.log(
+    `Trying to connect to ${host}:${port} as ${username}...`,
+  );
+
+  return new Promise((resolve, reject) => {
+    socket = new net.Socket();
+
+    socket.connect(port, host, () => {
+      console.log('Connected to the server!');
+      const message: ConnectToServerMessage = {
+        type: 'connect',
+        senderID: '',
+        content: username,
+      };
+      socket.write(JSON.stringify(message));
+      resolve(true);
+    });
+
+    socket.on('data', (data) => {
+      console.log('Received data:', data.toString());
+      handleServerResponse(data);
+    });
+
+    socket.on('error', (error) => {
+      console.error('Connection error:', error);
+      resolve(false);
+    });
+
+    socket.on('close', () => {
+      console.log('Connection closed');
+    });
+  });
 });
 
 ipcMainOn('send-message', (message) => {
@@ -127,5 +167,8 @@ ipcMainOn('disconnect-user-from-server', (user) => {
     content: user.username,
     senderID: user.userID,
   };
-  socket.write(JSON.stringify(message));
+  socket.write(JSON.stringify(message), () => {
+    socket.end();
+    console.log('Disconnected from the server');
+  });
 });

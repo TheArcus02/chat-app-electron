@@ -66,7 +66,10 @@ declare global {
 
   interface Window {
     electron: {
-      connectUserToServer: (username: string) => void;
+      connectUserToServer: (data: {
+        host: string;
+        username: string;
+      }) => Promise<unknown>;
       disconnectUserFromServer: (user: User) => void;
       sendChatMessage: (message: ChatMessage) => void;
       subscribeConnectionStatus: (
@@ -84,7 +87,10 @@ declare global {
   }
 
   type EventPayloadMapping = {
-    'connect-user-to-server': string;
+    'connect-user-to-server': {
+      host: string;
+      username: string;
+    };
     'disconnect-user-from-server': User;
     'connection-status': ConnectResponse | DisconnectResponse;
     'chat-message': ChatMessage;

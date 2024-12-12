@@ -1,50 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { useAuth } from '@/ui/context/auth-context';
-import { User, LogIn, Info } from 'lucide-react';
-
-const InputField = ({
-  label,
-  type,
-  value,
-  placeholder,
-  onChange,
-  error,
-}: any) => (
-  <div className='form-control w-full mb-4'>
-    <label className='block text-sm font-medium text-gray-300 mb-2'>
-      {label}
-    </label>
-    <input
-      type={type}
-      className='input input-bordered w-full bg-gray-700 text-white rounded-full py-3 px-4 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:border-indigo-500'
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-    />
-    {error && <p className='text-red-500 text-sm mt-2'>{error}</p>}
-  </div>
-);
-
-const Modal = ({ isOpen, onClose, title, children }: any) => {
-  if (!isOpen) return null;
-  return (
-    <div className='fixed inset-0 flex items-center justify-center bg-gray-700 bg-opacity-75 z-50'>
-      <div className='bg-white text-black p-6 rounded-xl w-1/3 shadow-xl'>
-        <h3 className='text-2xl font-semibold mb-4'>{title}</h3>
-        <div>{children}</div>
-        <div className='mt-4 text-center'>
-          <button
-            className='btn btn-sm btn-primary'
-            onClick={onClose}
-          >
-            Zamknij
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
+import { LogIn, Info } from 'lucide-react';
+import { toast } from 'react-toastify';
+import InputField from '@/ui/components/input-field';
+import Modal from '@/ui/components/modal';
 
 const Login = () => {
   // Form state
@@ -64,7 +24,7 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setError('');
     if (!name.trim() || name.length < 3) {
       setError('Login musi mieć co najmniej 3 znaki.');
@@ -76,8 +36,16 @@ const Login = () => {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      login(name);
+
+    setTimeout(async () => {
+      const result = await login(server, name);
+      if (!result) {
+        toast.error(
+          'Nie udało się połączyć z serwerem. Spróbuj ponownie.',
+        );
+        setIsSubmitting(false);
+      }
+      toast.success('Zalogowano pomyślnie!');
       navigate('/');
     }, 500);
   };
