@@ -2,6 +2,8 @@ import { AuthProvider } from '@/ui/context/auth-context';
 import { ChatContextProvider } from '@/ui/context/chat-context';
 import { UserListProvider } from '@/ui/context/user-list-context';
 import { Outlet } from 'react-router';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const GlobalWrapper = () => {
   return (
@@ -10,6 +12,7 @@ const GlobalWrapper = () => {
         <AuthProvider>
           <ChatContextProvider>
             <Outlet />
+            <ToastContainer theme='colored' position='bottom-right' />
           </ChatContextProvider>
         </AuthProvider>
       </UserListProvider>

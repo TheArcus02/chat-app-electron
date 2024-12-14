@@ -10,7 +10,9 @@ declare global {
     | 'connect'
     | 'chat'
     | 'connect_response'
-    | 'user_list_update';
+    | 'disconnect_response'
+    | 'user_list_update'
+    | 'disconnect';
 
   interface Message {
     type: MessageType;
@@ -24,6 +26,14 @@ declare global {
       userID: string;
       username: string;
       userList: User[];
+    };
+  }
+
+  interface DisconnectResponse extends Message {
+    type: 'disconnect_response';
+    content: {
+      userID: string;
+      username: string;
     };
   }
 
@@ -56,25 +66,33 @@ declare global {
 
   interface Window {
     electron: {
-      connectUserToServer: (username: string) => void;
-      dissconnectUserFromServer: (user: User) => void;
+      connectUserToServer: (data: {
+        host: string;
+        username: string;
+      }) => Promise<unknown>;
+      disconnectUserFromServer: (user: User) => void;
       sendChatMessage: (message: ChatMessage) => void;
       subscribeConnectionStatus: (
-        callback: (status: ConnectResponse) => void
+        callback: (
+          status: ConnectResponse | DisconnectResponse,
+        ) => void,
       ) => UnsubscribeFunction;
       subscribeChatMessages: (
-        callback: (message: ChatMessage) => void
+        callback: (message: ChatMessage) => void,
       ) => UnsubscribeFunction;
       subscribeUserListUpdate: (
-        callback: (message: UserListUpdateMessage) => void
+        callback: (message: UserListUpdateMessage) => void,
       ) => UnsubscribeFunction;
     };
   }
 
   type EventPayloadMapping = {
-    'connect-user-to-server': string;
+    'connect-user-to-server': {
+      host: string;
+      username: string;
+    };
     'disconnect-user-from-server': User;
-    'connection-status': ConnectResponse;
+    'connection-status': ConnectResponse | DisconnectResponse;
     'chat-message': ChatMessage;
     'send-message': ChatMessage;
     'connect-response': ConnectResponse;
