@@ -43,28 +43,6 @@ app.on('before-quit', () => {
   socket.end();
 });
 
-function connectToServer(host: string, port: number) {
-  console.log('Trying to connect to the server...');
-  socket = new net.Socket();
-
-  socket.connect(port, host, () => {
-    console.log('Connected to the server!');
-  });
-
-  socket.on('data', (data) => {
-    console.log('Received data:', data.toString());
-    handleServerResponse(data);
-  });
-
-  socket.on('error', (error) => {
-    console.error('Connection error:', error);
-  });
-
-  socket.on('close', () => {
-    console.log('Connection closed');
-  });
-}
-
 function handleServerResponse(data: Buffer) {
   try {
     const jsonData = JSON.parse(data.toString()) as Message;

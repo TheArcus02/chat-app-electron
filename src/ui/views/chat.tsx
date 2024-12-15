@@ -1,10 +1,19 @@
 import { useParams } from 'react-router';
 import { useChatContext } from '../context/chat-context';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useUserListContext } from '../context/user-list-context';
 import { cn } from '../lib/utils';
 import { useAuth } from '../context/auth-context';
 import { Send } from 'lucide-react';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+
+const chatInputSchema = z.object({
+  inputMessage: z.string().nonempty(),
+});
+
+type ChatInputSchemaType = z.infer<typeof chatInputSchema>;
 
 const Chat = () => {
   const { id: participantUserId } = useParams();
@@ -13,7 +22,16 @@ const Chat = () => {
   const { getUser } = useUserListContext();
   const { user: currentUser } = useAuth();
 
-  const [inputMessage, setInputMessage] = useState('');
+  const lastMessageRef = useRef<HTMLDivElement>(null);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ChatInputSchemaType>({
+    resolver: zodResolver(chatInputSchema),
+  });
 
   const chatUser = useMemo(
     () => getUser(participantUserId || ''),
@@ -30,21 +48,28 @@ const Chat = () => {
     );
   }, [allChatMessages, participantUserId]);
 
-  function handleSendMessage() {
+  useEffect(() => {
+    if (lastMessageRef.current) {
+      lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages]);
+
+  function onSubmit(data: ChatInputSchemaType) {
+    const { inputMessage } = data;
     if (!inputMessage || !participantUserId) return;
-    setInputMessage('');
     sendChatMessage(participantUserId, inputMessage);
+    reset();
   }
 
   return chatUser && currentUser ? (
     <>
       <div className='w-full'>
         <h1 className='text-2xl font-semibold'>
-          Chat with {chatUser.username}
+          Chat z {chatUser.username}
         </h1>
       </div>
-      <div className='w-full flex-1 overflow-y-scroll max-h-[calc(100vh-100px)]'>
-        {chatMessages.map((message) => {
+      <div className='w-full flex-1 py-4 overflow-y-scroll max-h-[calc(100vh-100px)]'>
+        {chatMessages.map((message, idx) => {
           const isSenderParticipant =
             message.senderID === participantUserId;
           const user = isSenderParticipant ? chatUser : currentUser;
@@ -55,6 +80,11 @@ const Chat = () => {
                 isSenderParticipant ? 'chat-start' : 'chat-end',
               )}
               key={message.content + message.senderID}
+              ref={
+                idx === chatMessages.length - 1
+                  ? lastMessageRef
+                  : null
+              }
             >
               <div className='chat-image avatar'>
                 <div className='w-10 rounded-full'>
@@ -71,21 +101,24 @@ const Chat = () => {
           );
         })}
       </div>
-      <div className='w-full flex space-x-2'>
+      <form
+        className='w-full flex space-x-2'
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <input
           type='text'
           className='input input-bordered w-full'
-          placeholder='Type your message here...'
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
+          placeholder='Napisz wiadomość...'
+          {...register('inputMessage')}
         />
         <button
           className='btn btn-primary btn-circle'
-          onClick={handleSendMessage}
+          type='submit'
+          disabled={Object.keys(errors).length > 0}
         >
           <Send className='w-5 h-5 text-primary-content' />
         </button>
-      </div>
+      </form>
     </>
   ) : (
     <div>User not found</div>
