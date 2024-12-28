@@ -25,6 +25,7 @@ type LoginSchemaType = z.infer<typeof loginSchema>;
 
 const Login = () => {
   const [showModal, setShowModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const Login = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<LoginSchemaType>({
     resolver: zodResolver(loginSchema),
   });
@@ -44,6 +45,7 @@ const Login = () => {
   }, [isAuthenticated, navigate]);
 
   const onSubmit = async (data: LoginSchemaType) => {
+    setIsSubmitting(true);
     const { name, server } = data;
 
     setTimeout(async () => {
@@ -52,6 +54,7 @@ const Login = () => {
         toast.error(
           'Nie udało się połączyć z serwerem. Spróbuj ponownie.',
         );
+        setIsSubmitting(false);
         return;
       }
 

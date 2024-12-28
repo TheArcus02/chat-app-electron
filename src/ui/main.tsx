@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import { BrowserRouter, Route, Routes } from 'react-router';
+import { HashRouter, Route, Routes } from 'react-router';
 import Login from './views/login.tsx';
 import AuthWrapper from './components/wrappers/auth-wrapper.tsx';
 import Chat from './views/chat.tsx';
@@ -10,7 +10,7 @@ import Dashboard from './views/dashboard.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route element={<GlobalWrapper />}>
           <Route path='/login' element={<Login />} />
@@ -21,6 +21,6 @@ createRoot(document.getElementById('root')!).render(
           </Route>
         </Route>
       </Routes>
-    </BrowserRouter>
-  </StrictMode>
+    </HashRouter>
+  </StrictMode>,
 );

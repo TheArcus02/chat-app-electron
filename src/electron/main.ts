@@ -21,6 +21,7 @@ app.on('ready', () => {
       preload: getPreloadPath(),
     },
   });
+
   if (isDev()) {
     window.loadURL('http://localhost:5123');
   } else {
@@ -126,11 +127,13 @@ ipcMainHandle('connect-user-to-server', (data) => {
 
     socket.on('error', (error) => {
       console.error('Connection error:', error);
+      socket.destroy();
       resolve(false);
     });
 
     socket.on('close', () => {
       console.log('Connection closed');
+      resolve(false);
     });
   });
 });

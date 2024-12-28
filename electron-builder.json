@@ -1,6 +1,6 @@
 {
   "appId": "com.putpoznan.chat-app",
-  "files": ["dist-electron", "dist-react"],
+  "files": ["dist-electron/**/*", "dist-react/**/*"],
   "extraResources": ["dist-electron/preload.cjs", "src/assets/**"],
   "icon": "./desktop-icon.png",
   "mac": {
